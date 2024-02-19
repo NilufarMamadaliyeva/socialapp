@@ -440,3 +440,25 @@ class HitMusicDetailApi(APIView):
         return Response(serializer.data)
     
         
+async def search_tracks(query, limit=10):
+    shazam = Shazam()
+    tracks = await shazam.search_track(query=query, limit=limit)
+    return tracks
+
+async def music_search_api(request):
+    if request.method == "GET":
+        query = request.GET.get('query', '')  # Get the query parameter from the request
+        limit = int(request.GET.get('limit', 10))  # Default limit is 10, adjust as needed
+        search_results = await search_tracks(query, limit)
+        # Extract relevant information from search results
+        serialized_data = [
+            {
+                "title": track["title"],
+                "subtitle": track["subtitle"],
+                "shazam_url": track["url"],
+                # Add more fields as needed
+            } for track in search_results
+        ]
+        return JsonResponse({'search_results': serialized_data})
+    else:
+        return JsonResponse({'error': 'Only GET method is supported'}, status=405)

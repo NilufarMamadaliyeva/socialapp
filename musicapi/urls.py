@@ -18,7 +18,6 @@ from .views import (
     music_latin_api,
     music_film_tv_api,
     about_track_api,
-    music_search_api,
     HitMusicListApi,
     HitMusicDetailApi,
 )
@@ -41,10 +40,8 @@ urlpatterns = [
     path("top/alternative/", music_alternative_api),
     path("top/latin/", music_latin_api),
     path("top/film_tv/", music_film_tv_api),
-    path("top/search/", music_search_api),
     # about music
     path("tracks/<int:pk>/", about_track_api),
-
     # hit music
     path("tracks/hit/", HitMusicListApi.as_view()),
     path("tracks/hit/<int:pk>/", HitMusicDetailApi.as_view()),

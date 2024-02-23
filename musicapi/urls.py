@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    download_song,
     music_api,
     music_uz_api,
     music_tr_api,
@@ -18,8 +19,11 @@ from .views import (
     music_latin_api,
     music_film_tv_api,
     about_track_api,
-    HitMusicListApi,
-    HitMusicDetailApi,
+    # Hit Music
+    HitMusicDetail,
+    HitMusicList,
+    HitMusicAPIUpdate,
+    download_track,
 )
 
 urlpatterns = [
@@ -43,6 +47,12 @@ urlpatterns = [
     # about music
     path("tracks/<int:pk>/", about_track_api),
     # hit music
-    path("tracks/hit/", HitMusicListApi.as_view()),
-    path("tracks/hit/<int:pk>/", HitMusicDetailApi.as_view()),
+    path("tracks/hit/", HitMusicList.as_view()),
+    path("tracks/hit/<int:pk>/", HitMusicDetail.as_view()),
+    path("tracks/hit/update/<int:pk>/", HitMusicAPIUpdate.as_view()),
+    path('tracks/hit/download/<int:pk>/', download_track),
+    # dowload shazam tracks
+    path(
+        "download-song/<str:title>/<str:subtitle>/", download_song, name="download-song"
+    ),
 ]

@@ -319,7 +319,7 @@ async def music_electronic_api(request):
         return JsonResponse({"error": "Only GET method is supported"}, status=405)
 
 
-async def top_rock_api(offset=0,limit=100):
+async def top_rock_api(offset=0, limit=100):
     shazam = Shazam()
     top_tracks = await shazam.top_world_genre_tracks(
         genre=GenreMusic.ROCK, limit=offset + limit
@@ -333,11 +333,17 @@ async def music_rock_api(request):
         page = int(request.GET.get("page", 1))
         search_query = request.GET.get("query", "")
 
-        limit = int(request.GET.get("limit", 10))  # Default limit is 10, adjust as needed
+        limit = int(
+            request.GET.get("limit", 10)
+        )  # Default limit is 10, adjust as needed
         offset = (page - 1) * limit
         rock_serialized_tracks = await top_rock_api(offset, limit)
         if search_query:
-            rock_serialized_tracks = [track for track in rock_serialized_tracks if search_query.lower() in track.title.lower() ]
+            rock_serialized_tracks = [
+                track
+                for track in rock_serialized_tracks
+                if search_query.lower() in track.title.lower()
+            ]
         serialized_data = [track.__dict__ for track in rock_serialized_tracks]
         return JsonResponse({"rock_serialized_tracks": serialized_data})
     else:
@@ -581,39 +587,54 @@ async def about_track_api(request, pk):
     else:
         return JsonResponse({"error": "Only GET method is supported"}, status=405)
 
+
 # Hit Music API
+
+from .permissions import IsAdminOrReadOnly, IsMusicOrReadOnly
+from rest_framework.permissions import IsAdminUser
+
 
 class HitMusicAPIUpdate(generics.UpdateAPIView):
     queryset = HitMusicModel.objects.all()
     serializer_class = HitMusicSerializer
+    permission_classes = [IsAdminUser]
+
 
 class HitMusicList(generics.ListCreateAPIView):
     queryset = HitMusicModel.objects.all()
     serializer_class = HitMusicSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
 
 class HitMusicDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = HitMusicModel.objects.all()
     serializer_class = HitMusicSerializer
+    permission_classes = [IsMusicOrReadOnly]
+
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from .models import HitMusicModel
 
+
 def download_track(request, pk):
     try:
         hit_music = get_object_or_404(HitMusicModel, pk=pk)
         file_path = hit_music.track.path
-        with open(file_path, 'rb') as file:
-            response = HttpResponse(file.read(), content_type='audio/mpeg')
-            response['Content-Disposition'] = 'attachment; filename="{}"'.format(hit_music.track_name + '.mp3')
+        with open(file_path, "rb") as file:
+            response = HttpResponse(file.read(), content_type="audio/mpeg")
+            response["Content-Disposition"] = 'attachment; filename="{}"'.format(
+                hit_music.track_name + ".mp3"
+            )
             return response
     except Exception as e:
         return HttpResponse(f"Error: {e}", status=500)
 
-    
+
 # Dowload music view
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 def download_song(request, title, subtitle):
     def get_youtube_links_from_json(json_data):
         data = json.loads(json_data)
@@ -644,7 +665,9 @@ def download_song(request, title, subtitle):
         try:
             yt = YouTube(youtube_url)
             video = yt.streams.filter(only_audio=True).first()
-            out_file = video.download(output_path=os.path.join(os.path.expanduser("~"), "Downloads"))
+            out_file = video.download(
+                output_path=os.path.join(os.path.expanduser("~"), "Downloads")
+            )
             new_file_path = rename_file_if_exists(out_file)  # Fayl nomini o'zgartirish
             return Response({"message": f"Downloaded: {new_file_path}"}, status=200)
         except Exception as e:

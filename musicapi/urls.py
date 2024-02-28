@@ -35,7 +35,7 @@ urlpatterns = [
     path("tracks/kz/", music_kz_api),
     path("tracks/tj/", music_tj_api),
     path("tracks/kg/", music_kg_api),
-    # janr
+    # janr   
     path("top/electronic/", music_electronic_api),
     path("top/rock/", music_rock_api),
     path("top/pop/", music_pop_api),

@@ -38,9 +38,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "knox",
     "drf_yasg",
     "rest_framework",
     "musicapi",
+    "regirter",
     "corsheaders",  # Add this line
 ]
 
@@ -144,5 +146,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
-    ]
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": 
+        ("knox.auth.TokenAuthentication",)
 }
